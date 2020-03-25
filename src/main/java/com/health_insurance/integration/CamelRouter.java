@@ -9,6 +9,8 @@ import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.component.kafka.KafkaConstants;
 import org.apache.camel.model.dataformat.JsonLibrary;
 import org.apache.camel.model.rest.RestBindingMode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -21,6 +23,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class CamelRouter extends RouteBuilder {
 
+    private static final Logger LOG = LoggerFactory.getLogger(CamelRouter.class);
+
     @Value("${kie.process.container.id}") 
     String processContainerId;
     @Value("${kie.process.definition.id}") 
@@ -32,6 +36,9 @@ public class CamelRouter extends RouteBuilder {
 	String kafkaHost;
     @Value("${kafka.port:9092}") 
     String kafkaPort;
+
+    @Value("${camel.seda.consumers}")
+    String sedaConsumers;
     
     private static final String KAFKA_SERIALIZER_CLASS_CONFIG = "org.apache.kafka.common.serialization.ByteArraySerializer";
     private static final String KAFKA_DESERIALIZER_CLASS_CONFIG = "org.apache.kafka.common.serialization.ByteArrayDeserializer";
@@ -69,6 +76,12 @@ public class CamelRouter extends RouteBuilder {
                 .route().routeId("kie-server-api")
                 .to("direct:runKieCommand");
 
+
+        rest("/kieserver").description("Call Kie Server")
+            .get("/process/instances")
+                .route().routeId("process-server-api")
+                .to("direct:processInstances");
+    
     // Direct routes
         from("direct:greetingsImpl").description("Greetings REST service implementation route")
             .routeId("greetings")
@@ -98,12 +111,12 @@ public class CamelRouter extends RouteBuilder {
             .log("    with the offset ${headers[kafka.OFFSET]}")
             .log("    with the key ${headers[kafka.KEY]}")  
             .log("\n Start a new process instance")
-            .to("direct:startProcess");
+            .to("seda:startProcess");
         
-        from("direct:startProcess")
+        fromF("seda:startProcess?concurrentConsumers=%s", sedaConsumers)
             .routeId("startProcess")
             .process(e -> {
-                System.out.println("Body: " + e.getIn().getBody());
+                LOG.debug("Body: " + e.getIn().getBody());
                 Trigger trigger = e.getIn().getBody(Trigger.class);
 
                 Map<String, Object> processVariables = new HashMap<>();
