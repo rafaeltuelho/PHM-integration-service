@@ -120,7 +120,7 @@ public class CamelRouter extends RouteBuilder {
                 Trigger trigger = e.getIn().getBody(Trigger.class);
 
                 Map<String, Object> processVariables = new HashMap<>();
-                processVariables.put("pTriggerId", trigger.getOriginalTriggerId());
+                processVariables.put("pTriggerId", trigger.getTriggerId());
                 processVariables.put("pMemberId", trigger.getMemberId());
 
                 e.getIn().setBody(processVariables);

@@ -5,14 +5,14 @@ package com.health_insurance.phm_model;
  */
 public class Trigger {
 
-    private String originalTriggerId;
+    private String triggerId;
     private String memberId;
 
-	public String getOriginalTriggerId() {
-		return originalTriggerId;
+	public String getTriggerId() {
+		return triggerId;
 	}
-	public void setOriginalTriggerId(String originalTriggerId) {
-		this.originalTriggerId = originalTriggerId;
+	public void setTriggerId(String triggerId) {
+		this.triggerId = triggerId;
 	}
 	public String getMemberId() {
 		return memberId;
@@ -23,7 +23,7 @@ public class Trigger {
     
 	@Override
 	public String toString() {
-		return "Trigger [memberId=" + memberId + ", originalTriggerId=" + originalTriggerId + "]";
+		return "Trigger [memberId=" + memberId + ", triggerId=" + triggerId + "]";
 	}
     
     
