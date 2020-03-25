@@ -5,7 +5,7 @@ It is responsible for routing events from a Kafka Stream Topic to the Red Hat Pr
 
 == API exposed
 
-Access the OpenAPI docs: http://localhost:8181/api-doc
+Access the OpenAPI docs: http://localhost:8181/webjars/swagger-ui/index.html?url=/camel/api-doc
                 
 == Deployment options
 

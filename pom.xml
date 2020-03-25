@@ -97,11 +97,6 @@
     </dependency>
 
     <!-- Data Model -->
-    <dependency>
-      <groupId>com.redhat.poc</groupId>
-      <artifactId>wellcare-model</artifactId>
-      <version>1.0-SNAPSHOT</version>
-    </dependency>
 
     <!-- For remote execution on KIE Server -->
     <dependency>
