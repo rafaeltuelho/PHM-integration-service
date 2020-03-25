@@ -22,13 +22,13 @@ You can use the following endpoint to generate some test msgs into Kafka Topic:
 ```
 
 == Stream load
-link:index.html[Docs]
+
 You can use https://jmeter.apache.org/[Apache JMeter] with https://github.com/GSLabDev/pepper-box[Pepper Box plugin] to load about 10m triggers using this JMeter Test plan link:JMteter_kafka_topic_load_plan.jmx[jmeter/JMteter_kafka_topic_load_plan.jmx]
 
 > before running the test plan make sure your local kafka cluster is up&running.
 > expects zookeper listening on `localhost:2181` and broker on `localhost:9092`
 
-> The Pepper Box plugin JAR file is avaiable inside the `jmeter/` dir. Before start JMeter copy this JAR into the `JMETER_HOME/lib/ext`
+> the Pepper Box plugin JAR file is avaiable inside the `jmeter/` dir. Before start JMeter copy this JAR into the `JMETER_HOME/lib/ext`
 
 == API exposed
 
@@ -105,4 +105,5 @@ $ mvn clean package
 ----
 $ mvn spring-boot:run
 ----
-. Go to link:http://localhost:8080[] and then follow the instructions on that page.
+. Go to link:http://localhost:8181[] and then follow the instructions on that page.
+. To view the Fuse Console got to link://localhost:10001/
