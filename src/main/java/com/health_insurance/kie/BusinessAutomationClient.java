@@ -67,6 +67,8 @@ public class BusinessAutomationClient {
 
     // If you use custom classes, such as Obj.class, add them to the configuration.
     Set<Class<?>> extraClassList = new HashSet<Class<?>>();
+
+    //TODO: encapsulate this and expose to the callers
     extraClassList.add(Task.class);
     extraClassList.add(Reminder.class);
     extraClassList.add(Result.class);
@@ -167,10 +169,10 @@ public class BusinessAutomationClient {
   /**
    * Start a new process instance given a process definition and a map of process' variables
    * 
-   * @param containerId
-   * @param processDefinitionId
-   * @param variables
-   * @return {@link Long} processInstanceId
+   * @param containerId kie container Id
+   * @param processDefinitionId process definition Id
+   * @param variables map of process input variables
+   * @return {@link Long} process instance id created
    */
   public Long startProcess(String containerId, String processDefinitionId, Map<String, Object> variables) {
     LOG.info("== Sending commands to the kie-server [" + containerId + "] ==");

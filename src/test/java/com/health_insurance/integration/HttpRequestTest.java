@@ -20,11 +20,6 @@ public class HttpRequestTest {
     private TestRestTemplate restTemplate;
 
     @Test
-    public void greetingsShouldReturnFallbackMessage() throws Exception {
-        Assert.assertEquals( "Hello, jacopo", this.restTemplate.getForObject("http://localhost:" + port + "/camel/greetings/jacopo", Greetings.class).getGreetings());
-    }
-
-    @Test
     public void healthShouldReturnOkMessage() throws Exception {
         Assert.assertEquals( "{\"status\":\"UP\"}", this.restTemplate.getForObject("http://localhost:" + port + "/health", String.class));
     }

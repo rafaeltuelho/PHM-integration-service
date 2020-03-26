@@ -66,11 +66,6 @@ public class CamelRouter extends RouteBuilder {
             .component("servlet")
             .bindingMode(RestBindingMode.json);
         
-        rest("/greetings").description("Greeting to {name}")
-            .get("/{name}").outType(Greetings.class)
-                .route().routeId("greeting-api")
-                .to("direct:greetingsImpl");
-
         rest("/trigger").description("Create a new Trigger and send it to Kafka Topic")
             .consumes("application/json")
             .produces("application/json")
@@ -78,17 +73,6 @@ public class CamelRouter extends RouteBuilder {
                 .route().routeId("trigger-api")
                 .to("direct:publishToKafka");
 
-        rest("/kieserver").description("Call Kie Server")
-            .get("/listContainers")
-                .route().routeId("kie-server-api")
-                .to("direct:runKieCommand");
-
-
-        rest("/kieserver").description("Call Kie Server")
-            .get("/process/instances")
-                .route().routeId("process-server-api")
-                .to("direct:processInstances");
-    
     // Direct routes
         from("direct:greetingsImpl").description("Greetings REST service implementation route")
             .routeId("greetings")
