@@ -11,6 +11,13 @@ import java.util.Set;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
+import com.health_insurance.phm_model.Reminder;
+import com.health_insurance.phm_model.Response;
+import com.health_insurance.phm_model.Result;
+import com.health_insurance.phm_model.Task;
+import com.health_insurance.phm_model.TaskActorAssignment;
+import com.health_insurance.phm_model.Trigger;
+
 import org.kie.api.KieServices;
 import org.kie.api.command.BatchExecutionCommand;
 import org.kie.api.command.Command;
@@ -60,7 +67,12 @@ public class BusinessAutomationClient {
 
     // If you use custom classes, such as Obj.class, add them to the configuration.
     Set<Class<?>> extraClassList = new HashSet<Class<?>>();
-    // extraClassList.add(Trigger.class);
+    extraClassList.add(Task.class);
+    extraClassList.add(Reminder.class);
+    extraClassList.add(Result.class);
+    extraClassList.add(TaskActorAssignment.class);
+    extraClassList.add(Trigger.class);
+    extraClassList.add(Response.class);
     conf.addExtraClasses(extraClassList);
 
     conf.setMarshallingFormat(FORMAT);

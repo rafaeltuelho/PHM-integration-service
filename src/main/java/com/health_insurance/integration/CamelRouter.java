@@ -1,8 +1,11 @@
 package com.health_insurance.integration;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
+import com.health_insurance.phm_model.Response;
 import com.health_insurance.phm_model.Trigger;
 
 import org.apache.camel.builder.RouteBuilder;
@@ -128,20 +131,20 @@ public class CamelRouter extends RouteBuilder {
                 e.getIn().setBody(decisionFacts);
             }) // call decision service
             .toF("bean:businessAutomationServiceClient?method=executeCommands(%s, %s, ${body})", decisionContainerId, decisionSessionName)
-            .log("Decision Results: [ ${body} ]");
-            //TODO: call startProcess
+            .log("Decision Results: [ ${body} ]")
+            .to("seda:startProcess");
 
         fromF("seda:startProcess?concurrentConsumers=%s", sedaConsumers)
             .routeId("startProcess")
             .process(e -> {
                 LOG.debug("Process request Body: " + e.getIn().getBody());
-                //TODO: Now I will receive a Map<String, Object>
-                //key 'resultFactObjects'
-                Trigger trigger = e.getIn().getBody(Trigger.class);
+
+                Map<String, Object> resultFactObjects = e.getIn().getBody(Map.class);
+                List<?> factsList = (List<?>)resultFactObjects.get("resultFactObjects");
+                List<?> responsesList = factsList.stream().filter(o -> o instanceof Response).collect(Collectors.toList());
 
                 Map<String, Object> processVariables = new HashMap<>();
-                processVariables.put("pTriggerId", trigger.getTriggerId());
-                processVariables.put("pMemberId", trigger.getMemberId());
+                processVariables.put("pDataList", responsesList);
 
                 e.getIn().setBody(processVariables);
             }) // start a new Process instance
