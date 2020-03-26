@@ -107,10 +107,10 @@ public class BusinessAutomationClient {
    * @param containerId
    * @param sessionName
    * @param facts map facts and its key identifiers (used as part of the fact output names)
-   * @return resultFacts
+   * @return resultFacts map of returned facts and its respective ids
    */
-  public List<Object> executeCommands(String containerId, String sessionName,HashMap<String, Object> facts) {
-    List<Object> resultFacts = new ArrayList<Object>();
+  public Map<String ,Object> executeCommands(String containerId, String sessionName, HashMap<String, Object> facts) {
+    Map<String, Object> resultFacts = new HashMap<String, Object>();
 
     LOG.info("== Sending commands to the kie-server [" + containerId + "] ==");
     LOG.info("\t feeding session [" + sessionName + "] up with the following input facts: ");
@@ -121,13 +121,15 @@ public class BusinessAutomationClient {
     // Get PriorApplications from the DB
     List<Command> kieCommands = new ArrayList<Command>();
     facts.forEach(
-      (k, o) -> kieCommands.add(commandsFactory.newInsert(o, "fact_" + k))
+      (k, o) -> kieCommands.add(commandsFactory.newInsert(o, "isertedFactObject_" + k))
     );
 
-    BatchExecutionCommand batchCommand = commandsFactory.newBatchExecution(
-      kieCommands, sessionName);
-      Command<?> fireAllRules = commandsFactory.newFireAllRules();
+    BatchExecutionCommand batchCommand = commandsFactory.newBatchExecution(kieCommands, sessionName);
+
+    Command<?> fireAllRules = commandsFactory.newFireAllRules("firedRules");
     kieCommands.add(fireAllRules);
+    Command<?> getObjects = commandsFactory.newGetObjects("resultFactObjects");
+    kieCommands.add(getObjects);
 
     ServiceResponse<ExecutionResults> executeResponse = 
       rulesClient.executeCommandsWithResults(containerId, batchCommand);
@@ -136,11 +138,11 @@ public class BusinessAutomationClient {
       LOG.info("Commands executed with success! Response: ");
 
       Collection<String> resultFactsIds = executeResponse.getResult().getIdentifiers();
+      LOG.info("\n\tFacts Returned: " + resultFactsIds);
       resultFactsIds.forEach(
-        id -> resultFacts.add(executeResponse.getResult().getValue(id))
+        id -> resultFacts.put(id, executeResponse.getResult().getValue(id))
       );
 
-      LOG.info("\n\tFacts Returned: " + resultFactsIds);
       LOG.info("\t" + resultFacts);
     } else {
       LOG.info("Error executing rules. Message: ");

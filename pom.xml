@@ -97,6 +97,11 @@
     </dependency>
 
     <!-- Data Model -->
+    <dependency>
+      <groupId>com.health-insurance</groupId>
+      <artifactId>PHM-Model</artifactId>
+      <version>DEMOJAM20-1.0.0-SNAPSHOT</version>
+    </dependency>
 
     <!-- For remote execution on KIE Server -->
     <dependency>

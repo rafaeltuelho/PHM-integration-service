@@ -25,6 +25,10 @@ public class CamelRouter extends RouteBuilder {
 
     private static final Logger LOG = LoggerFactory.getLogger(CamelRouter.class);
 
+    @Value("${kie.decision.container.id}") 
+    String decisionContainerId;
+    @Value("${kie.decision.session.name}") 
+	String decisionSessionName;
     @Value("${kie.process.container.id}") 
     String processContainerId;
     @Value("${kie.process.definition.id}") 
@@ -110,13 +114,29 @@ public class CamelRouter extends RouteBuilder {
             .log("    on the partition ${headers[kafka.PARTITION]}")
             .log("    with the offset ${headers[kafka.OFFSET]}")
             .log("    with the key ${headers[kafka.KEY]}")  
-            .log("\n Start a new process instance")
-            .to("seda:startProcess");
-        
+            .log("\n Call the decision server")
+            .to("seda:makeDecision");
+
+        fromF("seda:makeDecision?concurrentConsumers=%s", sedaConsumers)
+            .routeId("makeDecision")
+            .process(e -> {
+                LOG.debug("Decision request Body: " + e.getIn().getBody());
+                Trigger trigger = e.getIn().getBody(Trigger.class);
+
+                Map<String, Object> decisionFacts = new HashMap<>();
+                decisionFacts.put(Integer.toString(trigger.getTriggerId()), trigger);
+                e.getIn().setBody(decisionFacts);
+            }) // call decision service
+            .toF("bean:businessAutomationServiceClient?method=executeCommands(%s, %s, ${body})", decisionContainerId, decisionSessionName)
+            .log("Decision Results: [ ${body} ]");
+            //TODO: call startProcess
+
         fromF("seda:startProcess?concurrentConsumers=%s", sedaConsumers)
             .routeId("startProcess")
             .process(e -> {
-                LOG.debug("Body: " + e.getIn().getBody());
+                LOG.debug("Process request Body: " + e.getIn().getBody());
+                //TODO: Now I will receive a Map<String, Object>
+                //key 'resultFactObjects'
                 Trigger trigger = e.getIn().getBody(Trigger.class);
 
                 Map<String, Object> processVariables = new HashMap<>();
