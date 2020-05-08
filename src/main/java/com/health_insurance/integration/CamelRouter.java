@@ -74,17 +74,11 @@ public class CamelRouter extends RouteBuilder {
                 .to("direct:publishToKafka");
 
     // Direct routes
-        from("direct:greetingsImpl").description("Greetings REST service implementation route")
-            .routeId("greetings")
-            .streamCaching()
-            .to("bean:greetingsService?method=getGreetings"); 
-            
         from("direct:runKieCommand")
             .routeId("kieServerClient")
             .log("calling kie-server")
             .to("bean:businessAutomationServiceClient?method=listContainers")
             .log("${body}");
-            //.to("direct:publishToKafka");
         
         from("direct:publishToKafka")
             .routeId("kafkaPublisher")
